@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import os
 
 from utils.time_engine import is_window_active 
 from task1 import render_task1_chart
@@ -15,15 +14,15 @@ st.title("Enterprise Google Play Store Analytics Portal")
 
 @st.cache_data
 def get_play_store_data():
-    current_dir = os.path.dirname(__file__)
-    data_path = os.path.join(current_dir, "..", "data", "Play Store Data.csv")
-    return pd.read_csv(data_path)
+    # Fetching directly from the original training repository
+    url = "https://raw.githubusercontent.com/vaish-vkb/Google-Play-Store-Analytics/main/Play%20Store%20Data.csv"
+    return pd.read_csv(url)
 
 @st.cache_data
 def get_review_data():
-    current_dir = os.path.dirname(__file__)
-    data_path = os.path.join(current_dir, "..", "data", "User Reviews.csv")
-    return pd.read_csv(data_path)
+    # Fetching directly from the original training repository
+    url = "https://raw.githubusercontent.com/vaish-vkb/Google-Play-Store-Analytics/main/User%20Reviews.csv"
+    return pd.read_csv(url)
 
 try:
     raw_df = get_play_store_data()
@@ -92,5 +91,5 @@ try:
     else:
         st.info("Module 4 is offline. Mounts between 6:00 PM and 9:00 PM IST.")
 
-except FileNotFoundError:
-    st.error("Data assets missing. Verify both CSVs are in the data folder.")
+except Exception as e:
+    st.error(f"Failed to fetch external data assets. Please verify network connection. Error: {e}")
