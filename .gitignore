@@ -1,0 +1,11 @@
+# Data directory
+data/
+*.csv
+*.xlsx
+
+# Python environment artifacts
+__pycache__/
+*.pyc
+.env
+.venv/
+env/
