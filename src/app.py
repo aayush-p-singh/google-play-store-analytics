@@ -29,7 +29,7 @@ try:
     reviews_df = get_review_data()
     
     st.sidebar.header("Navigation & Status Control")
-    override_mode = st.sidebar.checkbox("Dev Mode: Override Time-Gating", value=True)
+    override_mode = st.sidebar.checkbox("Dev Mode: Override Time-Gating", value=False)
     
     st.subheader("Analytical Modules")
     
