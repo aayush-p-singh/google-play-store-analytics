@@ -1,5 +1,6 @@
 import pandas as pd
-import plotly.express as px
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 import streamlit as st
 
 def clean_size(size_str):
@@ -40,15 +41,10 @@ def load_and_filter_task1(df: pd.DataFrame) -> pd.DataFrame:
     
     valid_categories = []
     for _, row in grouped.iterrows():
-        rating_fail = row['avg_rating'] < 4.0
-        size_fail = row['avg_size'] < 10.0
-        jan_fail = 1 in row['last_updates']
-        
-        if not (rating_fail and size_fail and jan_fail):
+        if not (row['avg_rating'] < 4.0 and row['avg_size'] < 10.0 and 1 in row['last_updates']):
             valid_categories.append(row['Category'])
             
     final_df = df_top10[df_top10['Category'].isin(valid_categories)]
-    
     return final_df.groupby('Category').agg(
         Average_Rating=('Rating', 'mean'),
         Total_Reviews=('Reviews', 'sum')
@@ -56,21 +52,23 @@ def load_and_filter_task1(df: pd.DataFrame) -> pd.DataFrame:
 
 def render_task1_chart(df: pd.DataFrame):
     chart_data = load_and_filter_task1(df)
-    melted_df = chart_data.melt(
-        id_vars=['Category'], 
-        value_vars=['Average_Rating', 'Total_Reviews'],
-        var_name='Metric', 
-        value_name='Value'
+    
+    fig = make_subplots(specs=[[{"secondary_y": True}]])
+    
+    fig.add_trace(
+        go.Bar(x=chart_data['Category'], y=chart_data['Average_Rating'], name="Average Rating", marker_color="#1f77b4"),
+        secondary_y=False
+    )
+    fig.add_trace(
+        go.Bar(x=chart_data['Category'], y=chart_data['Total_Reviews'], name="Total Reviews", marker_color="#ff7f0e"),
+        secondary_y=True
     )
     
-    fig = px.bar(
-        melted_df,
-        x='Category',
-        y='Value',
-        color='Metric',
-        barmode='group',
-        title="Task 1: Average Rating & Total Reviews for Top Categories",
+    fig.update_layout(
+        title_text="Task 1: Category Comparison (Dual Axis Rating vs Reviews)",
+        barmode="group",
         template="plotly_dark"
     )
-    fig.update_layout(yaxis_type="log", hovermode="x unified")
+    fig.update_yaxes(title_text="Rating (1-5 Scale)", range=[0, 5], secondary_y=False)
+    fig.update_yaxes(title_text="Total Review Count", secondary_y=True)
     st.plotly_chart(fig, width="stretch")
